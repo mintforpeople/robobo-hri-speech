@@ -15,6 +15,9 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        maven {
+            url "http://bizancio:7080/nexus/content/repositories/snapshots/"
+        }
     }
 }
 

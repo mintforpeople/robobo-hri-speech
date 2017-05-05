@@ -22,6 +22,8 @@
 
 package com.mytechia.robobo.framework.hri.speech.recognition;
 
+import com.mytechia.robobo.framework.RoboboManager;
+
 import java.util.HashSet;
 
 /**
@@ -30,6 +32,7 @@ import java.util.HashSet;
 public abstract class ASpeechRecognitionModule implements ISpeechRecognitionModule{
     //The set of listeners
     private HashSet<ISpeechRecognitionListener> listeners;
+    protected RoboboManager m;
 
     //Class constructor
     public ASpeechRecognitionModule(){

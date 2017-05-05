@@ -196,6 +196,12 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
 
 
+
+        tts.setPitch(3.5f);
+        tts.setSpeechRate(1.8f);
+
+
+
         roboboManager.getModuleInstance(IRemoteControlModule.class).registerCommand("TALK", new ICommandExecutor() {
             @Override
             public void executeCommand(Command c, IRemoteControlModule rcmodule) {
@@ -229,7 +235,7 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     @Override
     public String getModuleVersion() {
-        return "0.1";
+        return "0.3.0";
     }
 
 

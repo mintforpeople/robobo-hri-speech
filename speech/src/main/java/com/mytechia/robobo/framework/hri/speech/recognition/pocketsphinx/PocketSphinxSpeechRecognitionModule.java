@@ -29,6 +29,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
+import com.mytechia.robobo.framework.LogLvl;
 import com.mytechia.robobo.framework.RoboboManager;
 import com.mytechia.robobo.framework.hri.speech.R;
 import com.mytechia.robobo.framework.hri.speech.recognition.ASpeechRecognitionModule;
@@ -109,7 +110,7 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
     public void removePhrase(String phrase) {
 
         if(!recognizablePhrases.remove(phrase)){
-            Log.e("PS_SpeechRecognition","Phrase "+phrase+" not found in the recognizable set");
+            m.log(LogLvl.WARNING, "PS_SpeechRecognition","Phrase "+phrase+" not found in the recognizable set");
         }
 
     }
@@ -146,7 +147,7 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             writer.print("");
             //Iterates over all the current phrases and adds them to the file
             for (String phrase:recognizablePhrases){
-                Log.d(TAG,"Adding phrase: "+phrase);
+                m.log(TAG,"Adding phrase: "+phrase);
                 writer.append(phrase+threshold);
 
             }
@@ -158,9 +159,9 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             e.printStackTrace();
         }
         try {
-            Log.d(TAG,phraseFile.list()[1]);
+            m.log(TAG,phraseFile.list()[1]);
         }catch (NullPointerException npe){
-            Log.d(TAG, "null array");
+            m.log(LogLvl.ERROR, TAG, "null array");
         }
 
         currentSearch = KEYWORDSEARCH;
@@ -184,7 +185,8 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
 
     @Override
     public void startup(final RoboboManager roboboManager) throws InternalErrorException {
-        Log.d(TAG,"Startup Recognition Module");
+        m.log(TAG,"Startup Recognition Module");
+        m = roboboManager;
         //Create a new hashset for phrases
         recognizablePhrases = new HashSet<String>(HASHSETSIZE);
         searches.add(KEYWORDSEARCH);
@@ -206,11 +208,11 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             @Override
             protected Exception doInBackground(Void... params) {
                 try {
-                    Log.d(TAG, "AT/----------");
-                    Log.d(TAG, "AT/Start AsyncTask");
+                    m.log(LogLvl.TRACE, TAG, "AT/----------");
+                    m.log(LogLvl.TRACE, TAG, "AT/Start AsyncTask");
                     Assets assets = new Assets(roboboManager.getApplicationContext());
 
-                    Log.d(TAG,"AT/ "+assets.toString());
+                    m.log(LogLvl.TRACE, TAG,"AT/ "+assets.toString());
                     assetsDir = assets.syncAssets();
                     setupRecognizer(assetsDir);
 
@@ -225,16 +227,16 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             protected void onPostExecute(Exception result) {
                 if (result != null) {
                     //throw new InternalErrorException("Could not start recognizer");
-                    Log.d(TAG,"AT/Could not start recognizer");
-                    Log.d(TAG,"AT/Exception: "+result.toString());
-                    Log.d(TAG,"AT/End");
+                    m.log(LogLvl.ERROR, TAG,"AT/Could not start recognizer");
+                    m.log(LogLvl.ERROR, TAG,"AT/Exception: "+result.toString());
+                    m.log(LogLvl.TRACE, TAG,"AT/End");
                 } else {
 
-                    Log.d(TAG,"AT/Starting keyword listener");
+                    m.log(LogLvl.DEBUG, TAG,"AT/Starting keyword listener");
                     //Update search and start listening
                     //updatePhrases();
-                    Log.d(TAG,"AT/End");
-                    Log.d(TAG, "AT/----------");
+                    m.log(LogLvl.TRACE, TAG,"AT/End");
+                    m.log(LogLvl.TRACE, TAG, "AT/----------");
                     hasStarted = true;
                     notifyStartup();
                 }
@@ -276,7 +278,7 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
 
 
     private void setupRecognizer(File assetsDir) throws IOException {
-        Log.d(TAG, "Setting up recognizer");
+        m.log(TAG, "Setting up recognizer");
         // The recognizer can be configured to perform multiple searches
         // of different kind and switch between them
 
@@ -322,7 +324,7 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             return;
 
         hyp = text;
-        Log.d(TAG,"Recognized part "+text);
+        m.log(LogLvl.TRACE, TAG,"Recognized part "+text);
 
 
     }
@@ -334,11 +336,11 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
             String text = hypothesis.getHypstr();
             //TODO Filtrar por probabilidad
 
-            Log.d(TAG,"Recognized "+text+" Prob: "+hypothesis.getBestScore());
+            m.log(LogLvl.TRACE, TAG,"Recognized "+text+" Prob: "+hypothesis.getBestScore());
             long time = System.currentTimeMillis();
             notifyPhrase(text,time);
         }
-        else{Log.d(TAG,"Recognized nothing");}
+        else{ m.log(LogLvl.TRACE, TAG,"Recognized nothing");}
 
         if (! paused){
             recognizer.startListening(currentSearch);//, timeout);

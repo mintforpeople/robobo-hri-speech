@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="simple-message-protocol-2.0.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mytechia/simple-message-protocol/2.0.4/1a359a8ad50dd81ef5fefcc22d1478de23c674aa/simple-message-protocol-2.0.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mytechia/simple-message-protocol/2.0.4/88c91b254f0d7041df97bcd4e797363753017167/simple-message-protocol-2.0.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

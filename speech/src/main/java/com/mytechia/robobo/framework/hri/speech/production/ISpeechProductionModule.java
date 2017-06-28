@@ -52,7 +52,6 @@ public interface ISpeechProductionModule extends IModule {
     /**
      *  Sets the current voice of the text to speech generator
      *  @param name The name of the voice to use
-     *  @throws VoiceNotFoundException, UnsupportedOperationException
      */
     void selectVoice(String name) throws VoiceNotFoundException;
 
@@ -60,14 +59,12 @@ public interface ISpeechProductionModule extends IModule {
     /**
      *  Sets the current voice of the text to speech generator
      *  @param voice The  voice to use
-     *  @throws VoiceNotFoundException, UnsupportedOperationException
      */
     void selectTtsVoice(ITtsVoice voice) throws VoiceNotFoundException;
 
     /**
      *  Returns a collection of the available voices for text to speech
      *  @return A collection of the available voices
-     *  @throws UnsupportedOperationException
      */
     Collection<ITtsVoice> getVoices();
 
@@ -76,4 +73,14 @@ public interface ISpeechProductionModule extends IModule {
      * @return  A collection of the available voices names
      */
     Collection<String> getStringVoices();
+    /**
+     * Suscribes a listener to the speech detection notifications
+     * @param listener The listener to be added
+     */
+    void suscribe(ISpeechProductionListener listener);
+    /**
+     * Unsuscribes a listener from the speech detection notifications
+     * @param listener The listener to be removed
+     */
+    void unsuscribe(ISpeechProductionListener listener);
 }

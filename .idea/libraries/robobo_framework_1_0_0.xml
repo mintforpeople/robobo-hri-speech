@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="robobo-framework-1.0.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.android/build-cache/37bfb28acaa3d46e0d9fab20365793ccbe865bf7/output/res" />
+      <root url="jar://$USER_HOME$/.android/build-cache/37bfb28acaa3d46e0d9fab20365793ccbe865bf7/output/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mytechia/robobo-framework/1.0.0/e4ef9d6854557b45cb624d5fd39b95358f9081cc/robobo-framework-1.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

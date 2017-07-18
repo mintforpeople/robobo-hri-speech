@@ -19,55 +19,47 @@
  *   along with Robobo HRI Modules.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-
-package com.mytechia.robobo.framework.hri.speech.recognition;
+package com.mytechia.robobo.framework.hri.speech.production;
 
 import com.mytechia.robobo.framework.RoboboManager;
+import com.mytechia.robobo.framework.remote_control.remotemodule.IRemoteControlModule;
+import com.mytechia.robobo.framework.remote_control.remotemodule.Status;
 
 import java.util.HashSet;
 
-/**
- * Abstract class that manages listeners
- */
-public abstract class ASpeechRecognitionModule implements ISpeechRecognitionModule{
+public abstract class ASpeechProductionModule implements ISpeechProductionModule {
     //The set of listeners
-    private HashSet<ISpeechRecognitionListener> listeners;
+    private HashSet<ISpeechProductionListener> listeners;
     protected RoboboManager m;
+    protected IRemoteControlModule remoteControlModule = null;
 
     //Class constructor
-    public ASpeechRecognitionModule(){
-        listeners = new HashSet<ISpeechRecognitionListener>();
+    public ASpeechProductionModule(){
+        listeners = new HashSet<ISpeechProductionListener>();
     }
 
 
     @Override
-    public void suscribe(ISpeechRecognitionListener listener) {
+    public void suscribe(ISpeechProductionListener listener) {
         listeners.add(listener);
     }
 
     @Override
-    public void unsuscribe(ISpeechRecognitionListener listener) {
+    public void unsuscribe(ISpeechProductionListener listener) {
         listeners.remove(listener);
     }
 
 
     /**
-     * Notifies the listener when a phrase is recognized
-     * @param phrase The phrase recognized
-     * @param timestamp The time when the phrase was recognized
+     * Notifies the listener when speech ends
      */
-    protected void notifyPhrase(String phrase, Long timestamp){
-        for (ISpeechRecognitionListener listener:listeners){
-            listener.phraseRecognized(phrase,timestamp);
+    protected void notifyEndOfSpeech(){
+        for (ISpeechProductionListener listener:listeners){
+            listener.onEndOfSpeech();
         }
+    if (remoteControlModule != null){
+        Status s = new Status("ENDOFSPEECH");
+        remoteControlModule.postStatus(s);
     }
-
-    /**
-     * Notifies the listeners the startup of the module
-     */
-    protected void notifyStartup(){
-        for (ISpeechRecognitionListener listener:listeners){
-            listener.onModuleStart();
-        }
     }
 }

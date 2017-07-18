@@ -28,11 +28,14 @@ import java.util.Locale;
 
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
 import com.mytechia.robobo.framework.RoboboManager;
+import com.mytechia.robobo.framework.exception.ModuleNotFoundException;
+import com.mytechia.robobo.framework.hri.speech.production.ASpeechProductionModule;
 import com.mytechia.robobo.framework.hri.speech.production.ISpeechProductionModule;
 import com.mytechia.robobo.framework.hri.speech.production.ITtsVoice;
 import com.mytechia.robobo.framework.hri.speech.production.VoiceNotFoundException;
@@ -44,7 +47,7 @@ import com.mytechia.robobo.framework.remote_control.remotemodule.IRemoteControlM
 /**
  * Implementation of the speech production module
  */
-public class AndroidSpeechProductionModule implements ISpeechProductionModule {
+public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
     //region VAR
     private TextToSpeech tts = null;
@@ -64,10 +67,13 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
     public void sayText(String text, Integer priority) {
 
         if (priority == ISpeechProductionModule.PRIORITY_HIGH){
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+//            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            tts.speak(text,TextToSpeech.QUEUE_FLUSH,null,"ROBSPEECH");
         }else
         if (priority == ISpeechProductionModule.PRIORITY_LOW){
-            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+//            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+            tts.speak(text,TextToSpeech.QUEUE_ADD,null,"ROBSPEECH");
+
         }
     }
 
@@ -169,9 +175,15 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     public void startup(RoboboManager roboboManager) throws InternalErrorException {
         context = roboboManager.getApplicationContext();
+        try {
+            remoteControlModule = roboboManager.getModuleInstance(IRemoteControlModule.class);
+        }catch (ModuleNotFoundException e){
+            e.printStackTrace();
+        }
 
         //Default language of the OS
         loc = Locale.getDefault();
+
 
 
         //Creation the TTS object
@@ -193,6 +205,28 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
         }
         );
+
+
+
+
+        tts.setPitch(0.4f);
+        tts.setSpeechRate(2.2f);
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String s) {
+
+            }
+
+            @Override
+            public void onDone(String s) {
+                notifyEndOfSpeech();
+            }
+
+            @Override
+            public void onError(String s) {
+
+            }
+        });
 
 
 
@@ -229,7 +263,7 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     @Override
     public String getModuleVersion() {
-        return "0.1";
+        return "0.3.1";
     }
 
 

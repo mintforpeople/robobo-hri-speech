@@ -209,8 +209,8 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
 
 
-        tts.setPitch(3.5f);
-        tts.setSpeechRate(1.8f);
+        tts.setPitch(0.4f);
+        tts.setSpeechRate(2.2f);
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {

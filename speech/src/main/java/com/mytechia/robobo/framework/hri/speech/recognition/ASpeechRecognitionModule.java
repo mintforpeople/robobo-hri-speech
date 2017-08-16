@@ -31,8 +31,9 @@ import java.util.HashSet;
  */
 public abstract class ASpeechRecognitionModule implements ISpeechRecognitionModule{
     //The set of listeners
-    private HashSet<ISpeechRecognitionListener> listeners;
     protected RoboboManager m;
+    private HashSet<ISpeechRecognitionListener> listeners;
+
 
     //Class constructor
     public ASpeechRecognitionModule(){

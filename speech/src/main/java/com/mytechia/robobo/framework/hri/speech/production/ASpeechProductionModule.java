@@ -29,6 +29,7 @@ import java.util.HashSet;
 
 public abstract class ASpeechProductionModule implements ISpeechProductionModule {
     //The set of listeners
+    protected static String BUNDLELANGKEY = "lang";
     private HashSet<ISpeechProductionListener> listeners;
     protected RoboboManager m;
     protected IRemoteControlModule remoteControlModule = null;

@@ -55,6 +55,7 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
     private Context context = null;
     Collection<ITtsVoice> voices = null;
     private String TAG = "AnsdroidSpeechP";
+
     //endregion
 
     //region ISpeechProductionModule Methods
@@ -175,14 +176,21 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
     public void startup(RoboboManager roboboManager) throws InternalErrorException {
         context = roboboManager.getApplicationContext();
+
+        String lang = roboboManager.getOptions().getString(BUNDLELANGKEY);
         try {
             remoteControlModule = roboboManager.getModuleInstance(IRemoteControlModule.class);
         }catch (ModuleNotFoundException e){
             e.printStackTrace();
         }
 
-        //Default language of the OS
-        loc = Locale.getDefault();
+
+        if (lang != null) {
+            loc = new Locale(lang);
+        }else {
+            //Default language of the OS
+            loc = Locale.getDefault();
+        }
 
 
 

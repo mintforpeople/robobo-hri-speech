@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="robobo-remote-control-module-1.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/speech/build/intermediates/exploded-aar/com.mytechia/robobo-remote-control-module/1.0.1-SNAPSHOT/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/speech/build/intermediates/exploded-aar/com.mytechia/robobo-remote-control-module/1.0.1-SNAPSHOT/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.mytechia/robobo-remote-control-module/1.0.1-SNAPSHOT/bb6d43a6b1280361ff6229699dac10d36eced8d/robobo-remote-control-module-1.0.1-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

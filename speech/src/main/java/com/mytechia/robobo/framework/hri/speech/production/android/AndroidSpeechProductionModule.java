@@ -216,9 +216,13 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
 
 
-
-        tts.setPitch(0.4f);
-        tts.setSpeechRate(2.2f);
+        if (loc.getLanguage().equals("es")) {
+            tts.setPitch(0.4f);
+            tts.setSpeechRate(2.2f);
+        }else{
+            tts.setPitch(0.48f);
+            tts.setSpeechRate(1.2f);
+        }
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String s) {

@@ -59,7 +59,7 @@ public abstract class ASpeechProductionModule implements ISpeechProductionModule
             listener.onEndOfSpeech();
         }
     if (remoteControlModule != null){
-        Status s = new Status("ENDOFSPEECH");
+        Status s = new Status("UNLOCK-TALK");
         remoteControlModule.postStatus(s);
     }
     }

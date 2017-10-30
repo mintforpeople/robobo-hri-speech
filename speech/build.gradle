@@ -26,7 +26,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.mytechia:robobo-framework:1.3.3-SNAPSHOT'
     compile files('libs/pocketsphinx-android-5prealpha-nolib.jar')
-    compile 'com.mytechia:robobo-remote-control-module:1.0.1-SNAPSHOT'
+    compile 'com.mytechia:robobo-remote-control:1.0.1-SNAPSHOT'
 }
 
 apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

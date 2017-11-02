@@ -185,8 +185,9 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
 
     @Override
     public void startup(final RoboboManager roboboManager) throws InternalErrorException {
-        m.log(TAG,"Startup Recognition Module");
         m = roboboManager;
+        m.log(TAG,"Startup Recognition Module");
+
         //Create a new hashset for phrases
         recognizablePhrases = new HashSet<String>(HASHSETSIZE);
         searches.add(KEYWORDSEARCH);

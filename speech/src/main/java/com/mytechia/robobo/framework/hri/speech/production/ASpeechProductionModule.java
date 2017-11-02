@@ -29,6 +29,7 @@ import java.util.HashSet;
 
 public abstract class ASpeechProductionModule implements ISpeechProductionModule {
     //The set of listeners
+    protected static String BUNDLELANGKEY = "lang";
     private HashSet<ISpeechProductionListener> listeners;
     protected RoboboManager m;
     protected IRemoteControlModule remoteControlModule = null;
@@ -58,7 +59,7 @@ public abstract class ASpeechProductionModule implements ISpeechProductionModule
             listener.onEndOfSpeech();
         }
     if (remoteControlModule != null){
-        Status s = new Status("ENDOFSPEECH");
+        Status s = new Status("UNLOCK-TALK");
         remoteControlModule.postStatus(s);
     }
     }

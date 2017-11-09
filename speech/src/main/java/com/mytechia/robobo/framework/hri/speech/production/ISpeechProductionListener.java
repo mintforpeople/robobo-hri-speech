@@ -5,5 +5,8 @@ package com.mytechia.robobo.framework.hri.speech.production;
  */
 
 public interface ISpeechProductionListener {
+    /**
+     * Notifies when a phrase ends
+     */
     public void onEndOfSpeech();
 }

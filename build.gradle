@@ -4,9 +4,12 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:7.3.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -16,9 +19,15 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        // Nexus GII IP: 10.113.36.13:8443
+        // Should be static. Ask Alejandro Paz if the server is dead
         maven {
-            url "http://bizancio:7080/nexus/content/repositories/snapshots/"
+            url "https://10.113.36.13:8443/nexus/content/repositories/snapshots/"
         }
+        maven {
+            url "https://maven.google.com"
+        }
+        google()
     }
 }
 

@@ -218,7 +218,7 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
         if (loc.getLanguage().equals("es")) {
             tts.setPitch(0.4f);
-            tts.setSpeechRate(2.2f);
+            tts.setSpeechRate(1.2f);
         }else{
             tts.setPitch(0.48f);
             tts.setSpeechRate(1.2f);
@@ -278,7 +278,13 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
         return "0.3.1";
     }
 
+    public void setPitch(float pitch){
+        tts.setPitch(pitch);
+    }
 
+    public void setSpeechRate(float speechRate){
+        tts.setSpeechRate(speechRate);
+    }
 
     //endregion
 

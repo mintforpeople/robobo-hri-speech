@@ -26,12 +26,10 @@ import android.os.AsyncTask;
 import android.os.Debug;
 import android.os.Environment;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
 import com.mytechia.robobo.framework.LogLvl;
 import com.mytechia.robobo.framework.RoboboManager;
-import com.mytechia.robobo.framework.hri.speech.R;
 import com.mytechia.robobo.framework.hri.speech.recognition.ASpeechRecognitionModule;
 
 
@@ -40,7 +38,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.AbstractCollection;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 

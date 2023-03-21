@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: 'maven-push.gradle'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 33
@@ -17,19 +17,46 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     api 'com.mytechia:robobo-framework:1.3.4'
     api files('libs/pocketsphinx-android-5prealpha-nolib.jar')
     api 'com.mytechia:robobo-remote-control:1.0.2'
 }
 
-afterEvaluate { project ->
-    android.libraryVariants.all { variant ->
-        tasks.androidJavadocs.doFirst {
-            classpath += files(variant.javaCompile.classpath.files)
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name 'LocalNexus'
+                allowInsecureProtocol = true
+                credentials {
+                    username NEXUS_USER
+                    password NEXUS_PASSWORD
+                }
+                if(VERSION_NAME.endsWith('-SNAPSHOT')) {
+                    url SNAPSHOT_REPOSITORY_URL
+                } else {
+                    url RELEASE_REPOSITORY_URL
+                }
+            }
+        }
+
+        publications {
+            library(MavenPublication) {
+                from components.release
+                groupId GROUP
+                artifactId POM_ARTIFACT_ID
+                version VERSION_NAME
+            }
         }
     }
 }

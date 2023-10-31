@@ -23,6 +23,11 @@ android {
             withJavadocJar()
         }
     }
+    sourceSets {
+        main {
+            assets.srcDirs += "$buildDir/generated/assets"
+        }
+    }
 }
 
 dependencies {

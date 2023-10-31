@@ -50,7 +50,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
         AssetManager assetManager = manager.getApplicationContext().getAssets();
 
         try {
-            InputStream inputStream = assetManager.open("sound.properties");
+            InputStream inputStream = assetManager.open("speech.properties");
             properties.load(inputStream);
         } catch (IOException e) {
             e.printStackTrace();

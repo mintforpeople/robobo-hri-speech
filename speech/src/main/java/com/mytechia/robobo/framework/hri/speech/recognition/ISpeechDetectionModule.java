@@ -29,4 +29,6 @@ public interface ISpeechDetectionModule extends IModule {
      * @param listener
      */
     public void unsuscribeAll(ISpeechListener listener);
+
+    public void toggleDetection(boolean status);
 }

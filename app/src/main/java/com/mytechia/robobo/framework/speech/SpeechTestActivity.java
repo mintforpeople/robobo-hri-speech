@@ -14,8 +14,8 @@ public class SpeechTestActivity extends AppCompatActivity {
 
     private ISpeechProductionModule productionModule;
     private ISpeechDetectionModule detectionModule;
-
     private RoboboManager manager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,6 @@ public class SpeechTestActivity extends AppCompatActivity {
             public void onRoboboManagerStarted(RoboboManager roboboManager) {
                 manager = roboboManager;
                 startapp();
-
-
             }
 
             @Override
@@ -45,11 +43,8 @@ public class SpeechTestActivity extends AppCompatActivity {
         try {
             productionModule = manager.getModuleInstance(ISpeechProductionModule.class);
             detectionModule = manager.getModuleInstance(ISpeechDetectionModule.class);
-            Log.d("TEST","TEST");
         } catch (ModuleNotFoundException e) {
             e.printStackTrace();
         }
-
-
     }
 }

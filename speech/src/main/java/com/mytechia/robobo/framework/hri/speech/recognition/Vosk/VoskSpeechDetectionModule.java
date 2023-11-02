@@ -1,6 +1,7 @@
 package com.mytechia.robobo.framework.hri.speech.recognition.Vosk;
 
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
 import com.mytechia.robobo.framework.LogLvl;
@@ -36,10 +37,8 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     private SpeechService speechService;
     private Recognizer recognizer;
     private float samplerate = 16000.f;
-
     private String TAG = "VoskSpeechDetectionModule";
 
-    private boolean doDetection = true;
 
     @Override
     public void startup(RoboboManager manager) throws InternalErrorException {
@@ -128,40 +127,21 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     }
 
     @Override
-    public void onFinalResult(String hypothesis) {
-
-    }
+    public void onFinalResult(String s) { processResult(s, true);}
 
     private void processResult(String s){
+        processResult(s, false);
+    }
+
+    private void processResult(String s, boolean finalResult){
         //Check better iteration options
         if (!doDetection)
             return;
-
         try {
-
             JSONObject jsonObject = new JSONObject(s);
             if(jsonObject.has("text")) {
                 String message =  jsonObject.getString("text");
-
-                m.log(LogLvl.DEBUG, TAG, "message processed: " + message);
-
-                for (String key : phraselisteners.keySet()) {
-                    if (s.contains(key)) {
-                        phraselisteners.get(key).onResult(message);
-                    }
-                }
-
-                for (   ISpeechListener l : anyListeners) {
-                    l.onResult(message);
-                }
-
-                // Send status via remote module
-                if (remoteModule!=null) {
-                    Status status = new Status("SpeechDetector::"+message);
-                    remoteModule.postStatus(status);
-                }
-
-
+                if (message != "") notifyPhrase(message, finalResult);
             }
 
         }catch (JSONException e) {

@@ -23,7 +23,7 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
     protected RoboboManager m;
     protected IRemoteControlModule remoteModule = null;
     protected boolean doDetection = true;
-
+    protected boolean detectAnything = true;
     public ASpeechDetectionModule(){
         anyListeners = new HashSet<ISpeechListener>();
         phraselisteners = new HashMap<String, ISpeechListener>();
@@ -34,12 +34,14 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
 
     @Override
     public void suscribePhrase(ISpeechListener listener, String phrase) {
+        remotePhrases.add(phrase);
         phraselisteners.put(phrase, listener);
     }
 
     @Override
     public void unsuscribePhrase(ISpeechListener listener, String phrase) {
-        phraselisteners.remove(phrase, listener);
+        remotePhrases.remove(phrase);
+        phraselisteners.remove(phrase);
     }
 
     @Override
@@ -55,12 +57,21 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
         }
     }
 
+    @Override
+    public void toggleDetection(boolean status){
+        this.doDetection = status;
+    }
+
+    public void toggleDetectPhrases(boolean status){
+        this.detectAnything = !status;
+    }
+
     protected void registerCommands(){
-        remoteModule.registerCommand("ADD-PHRASE", new ICommandExecutor() {
+        remoteModule.registerCommand("SPEECH-ADD-PHRASE", new ICommandExecutor() {
             @Override
             public void executeCommand(Command c, IRemoteControlModule rcmodule) {
                 String phrase = c.getParameters().get("phrase");
-                remotePhrases.add(phrase);
+                if(!remotePhrases.contains(phrase)){remotePhrases.add(phrase);}
 
                 Status status = new Status("REGISTERED-PHRASES");
                 status.putContents("phrases", TextUtils.join(",", remotePhrases));
@@ -68,33 +79,72 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
 
             }
         });
-        remoteModule.registerCommand("REMOVE-PHRASE", new ICommandExecutor() {
+
+        remoteModule.registerCommand("SPEECH-REMOVE-PHRASE", new ICommandExecutor() {
             @Override
             public void executeCommand(Command c, IRemoteControlModule rcmodule) {
                 String phrase = c.getParameters().get("phrase");
-                remotePhrases.remove(phrase);
+                if(remotePhrases.contains(phrase)){remotePhrases.remove(phrase);}
 
                 Status status = new Status("REGISTERED-PHRASES");
                 status.putContents("phrases", TextUtils.join(",", remotePhrases));
                 remoteModule.postStatus(status);
             }
         });
+
         remoteModule.registerCommand("START-SPEECH-DETECTION", new ICommandExecutor() {
             @Override
             public void executeCommand(Command c, IRemoteControlModule rcmodule) {
-                doDetection = true;
+                toggleDetection(true);
             }
         });
         remoteModule.registerCommand("STOP-SPEECH-DETECTION", new ICommandExecutor() {
             @Override
             public void executeCommand(Command c, IRemoteControlModule rcmodule) {
-                doDetection = false;
+                toggleDetection(false);
+            }
+        });
+
+        // Any switches to anything, doesn't delete registered phrases
+        remoteModule.registerCommand("SPEECH-DETECT-ANY", new ICommandExecutor() {
+            @Override
+            public void executeCommand(Command c, IRemoteControlModule rcmodule) {
+                toggleDetectPhrases(false);
+            }
+        });
+
+        // Any switches to anything, doesn't delete registered phrases
+        remoteModule.registerCommand("SPEECH-DETECT-PHRASES-ONLY", new ICommandExecutor() {
+            @Override
+            public void executeCommand(Command c, IRemoteControlModule rcmodule) {
+                toggleDetectPhrases(true);
             }
         });
     }
 
+    private boolean isRegisteredPhrase(String message){
+        for (String rPhrase : remotePhrases) {
+            return message.contains(rPhrase);
+        }
+        return false;
+    }
 
-    //public void suscribe(ISpeechListener listener){ listeners.add(listener); }
-    //public void unsuscribe(ISpeechListener listener){ listeners.remove(listener); }
-
+    protected void notifyPhrase(String message, boolean finalResult){
+        for (String key : phraselisteners.keySet()) {
+            if (message.contains(key)) {
+                phraselisteners.get(key).onResult(message);
+            }
+        }
+        for (ISpeechListener l : anyListeners) {
+            l.onResult(message);
+        }
+        if(detectAnything || (!detectAnything && isRegisteredPhrase(message))){
+            if (remoteModule != null && !message.equals("")){
+                Status st = new Status("SPEECH");
+                st.putContents("message", message);
+                st.putContents("final", finalResult + "");
+                remoteModule.postStatus(st);
+            }
+        }
+    }
 }

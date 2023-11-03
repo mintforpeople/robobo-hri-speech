@@ -27,6 +27,7 @@ import org.vosk.android.StorageService;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -39,6 +40,8 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     private float samplerate = 16000.f;
     private String TAG = "VoskSpeechDetectionModule";
 
+    private Locale loc = null;
+
 
     @Override
     public void startup(RoboboManager manager) throws InternalErrorException {
@@ -47,6 +50,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
         // Load propreties from file
         Properties properties = new Properties();
         AssetManager assetManager = manager.getApplicationContext().getAssets();
+        String lang = manager.getOptions().getString(BUNDLELANGKEY);
 
         try {
             InputStream inputStream = assetManager.open("speech.properties");
@@ -66,15 +70,24 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
             registerCommands();
         }
 
+        if (lang != null) {
+            loc = new Locale(lang);
+        }else {
+            //Default language of the OS
+            loc = Locale.getDefault();
+        }
+
+        m.log(LogLvl.DEBUG, TAG,"Loaded Locale: " + loc.getLanguage());
+
 
         m.log(LogLvl.DEBUG, TAG,"Properties loaded");
 
         samplerate = Float.parseFloat(properties.getProperty("model_samplerate"));
         m.log(LogLvl.DEBUG, TAG,":   samplerate");
 
-        String locale = "es-es";
+
         ///
-        StorageService.unpack(m.getApplicationContext(), "model-" + locale, "model",
+        StorageService.unpack(m.getApplicationContext(), "model-" + loc.getLanguage(), "model",
                 (model) -> {
                     this.model = model;
                     m.log(LogLvl.DEBUG, TAG,":   model " + model);

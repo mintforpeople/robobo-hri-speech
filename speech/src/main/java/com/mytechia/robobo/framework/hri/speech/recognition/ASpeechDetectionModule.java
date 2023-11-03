@@ -14,9 +14,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
 
+    protected static String BUNDLELANGKEY = "lang";
     public HashSet<ISpeechListener> anyListeners;
     public HashMap<String, ISpeechListener> phraselisteners;
     public List<String> remotePhrases;
@@ -24,6 +26,7 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
     protected IRemoteControlModule remoteModule = null;
     protected boolean doDetection = true;
     protected boolean detectAnything = true;
+
     public ASpeechDetectionModule(){
         anyListeners = new HashSet<ISpeechListener>();
         phraselisteners = new HashMap<String, ISpeechListener>();

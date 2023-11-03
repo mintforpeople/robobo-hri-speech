@@ -39,10 +39,10 @@ dependencies {
 
 tasks.register('genUUID') {
     def uuid_en = UUID.randomUUID().toString()
-    def odir_en = file("$buildDir/generated/assets/model-en-us")
+    def odir_en = file("$buildDir/generated/assets/model-en")
     def ofile_en = file("$odir_en/uuid")
     def uuid_es = UUID.randomUUID().toString()
-    def odir_es = file("$buildDir/generated/assets/model-es-es")
+    def odir_es = file("$buildDir/generated/assets/model-es")
     def ofile_es = file("$odir_es/uuid")
     doLast {
         mkdir odir_en

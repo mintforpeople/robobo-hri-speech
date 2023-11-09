@@ -24,7 +24,7 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
     public List<String> remotePhrases;
     protected RoboboManager m;
     protected IRemoteControlModule remoteModule = null;
-    protected boolean doDetection = true;
+    protected boolean doDetection = false;
     protected boolean detectAnything = true;
 
     public ASpeechDetectionModule(){
@@ -140,7 +140,7 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
         for (ISpeechListener l : anyListeners) {
             l.onResult(message);
         }
-        if(detectAnything || (!detectAnything && !remotePhrases.isEmpty())){
+        if(detectAnything || (!detectAnything && !recognizedPhrases.isEmpty())){
             if (remoteModule != null && !message.equals("")){
                 Status st = new Status("SPEECH");
                 st.putContents("message", message);

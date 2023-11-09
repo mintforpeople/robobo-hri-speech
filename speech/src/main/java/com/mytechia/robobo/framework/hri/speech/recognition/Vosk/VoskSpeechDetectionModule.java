@@ -154,7 +154,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
             JSONObject jsonObject = new JSONObject(s);
             if(jsonObject.has("text")) {
                 String message =  jsonObject.getString("text");
-                if (message != "") notifyPhrase(message, finalResult);
+                if (!message.equals("")) notifyPhrase(message, finalResult);
             }
 
         }catch (JSONException e) {

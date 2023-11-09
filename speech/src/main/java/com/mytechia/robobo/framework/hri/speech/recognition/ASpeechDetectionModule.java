@@ -125,26 +125,26 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
         });
     }
 
-    private boolean isRegisteredPhrase(String message){
-        for (String rPhrase : remotePhrases) {
-            return message.contains(rPhrase);
-        }
-        return false;
-    }
-
     protected void notifyPhrase(String message, boolean finalResult){
+        ArrayList<String> recognizedPhrases =  new ArrayList<String>();
         for (String key : phraselisteners.keySet()) {
             if (message.contains(key)) {
                 phraselisteners.get(key).onResult(message);
             }
         }
+        for (String phrase : remotePhrases) {
+            if (message.contains(phrase) && !recognizedPhrases.contains(phrase)) {
+                recognizedPhrases.add(phrase);
+            }
+        }
         for (ISpeechListener l : anyListeners) {
             l.onResult(message);
         }
-        if(detectAnything || (!detectAnything && isRegisteredPhrase(message))){
+        if(detectAnything || (!detectAnything && !remotePhrases.isEmpty())){
             if (remoteModule != null && !message.equals("")){
                 Status st = new Status("SPEECH");
                 st.putContents("message", message);
+                st.putContents("recognized", TextUtils.join(",", recognizedPhrases));
                 st.putContents("final", finalResult + "");
                 remoteModule.postStatus(st);
             }

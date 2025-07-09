@@ -22,17 +22,22 @@
 package com.mytechia.robobo.framework.hri.speech.production.android;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Properties;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
+import com.mytechia.robobo.framework.LogLvl;
 import com.mytechia.robobo.framework.RoboboManager;
 import com.mytechia.robobo.framework.exception.ModuleNotFoundException;
 import com.mytechia.robobo.framework.hri.speech.production.ASpeechProductionModule;
@@ -55,6 +60,9 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
     private Context context = null;
     Collection<ITtsVoice> voices = null;
     private String TAG = "AnsdroidSpeechP";
+    private Properties speechProperties = null;
+    private float speechRate;
+    private float speechPitch;
 
     //endregion
 
@@ -177,6 +185,15 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
     public void startup(RoboboManager roboboManager) throws InternalErrorException {
         context = roboboManager.getApplicationContext();
 
+        AssetManager assetManager = roboboManager.getApplicationContext().getAssets();
+        speechProperties = new Properties();
+        try {
+            InputStream inputStream = assetManager.open("speech.properties");
+            speechProperties.load(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         String lang = roboboManager.getOptions().getString(BUNDLELANGKEY);
         try {
             remoteControlModule = roboboManager.getModuleInstance(IRemoteControlModule.class);
@@ -191,6 +208,8 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
             //Default language of the OS
             loc = Locale.getDefault();
         }
+
+
 
 
 
@@ -217,11 +236,31 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
 
         if (loc.getLanguage().equals("es")) {
-            tts.setPitch(0.4f);
-            tts.setSpeechRate(1.2f);
+            speechRate = 1.2f;
+            if(speechProperties.contains("speech_rate")){
+                speechRate = Float.parseFloat(speechProperties.getProperty("speech_rate"));
+            }
+
+            speechPitch = 0.4f;
+            if(speechProperties.contains("speech_pitch")){
+                speechPitch = Float.parseFloat(speechProperties.getProperty("speech_pitch"));
+            }
+
+            tts.setPitch(speechPitch);
+            tts.setSpeechRate(speechRate);
         }else{
-            tts.setPitch(0.48f);
-            tts.setSpeechRate(1.2f);
+            speechRate = 1.2f;
+            if(speechProperties.contains("speech_rate")){
+                speechRate = Float.parseFloat(speechProperties.getProperty("speech_rate"));
+            }
+
+            speechPitch = 0.48f;
+            if(speechProperties.contains("speech_pitch")){
+                speechPitch = Float.parseFloat(speechProperties.getProperty("speech_pitch"));
+            }
+
+            tts.setPitch(speechPitch);
+            tts.setSpeechRate(speechRate);
         }
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override

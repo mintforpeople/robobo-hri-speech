@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.mytechia.commons.framework.exception.InternalErrorException;
 import com.mytechia.robobo.framework.RoboboManager;
 import com.mytechia.robobo.framework.exception.ModuleNotFoundException;
+import com.mytechia.robobo.framework.hri.speech.production.ISpeechProductionListener;
 import com.mytechia.robobo.framework.hri.speech.production.ISpeechProductionModule;
 import com.mytechia.robobo.framework.hri.speech.recognition.ISpeechDetectionModule;
 import com.mytechia.robobo.framework.hri.speech.recognition.ISpeechListener;
@@ -21,10 +23,25 @@ public class SpeechTestActivity extends AppCompatActivity {
     private RoboboManager manager;
     private TextView SpeechTextView;
 
+    private Boolean isSpeaking = false;
+
     private class SpeechListener implements ISpeechListener{
         @Override
         public void onResult(String s) {
-            SpeechTextView.append(s + "\n");
+            if (!isSpeaking){
+                SpeechTextView.append(s + "\n");
+                isSpeaking = true;
+                productionModule.sayText(s, ISpeechProductionModule.PRIORITY_LOW);
+            }
+        }
+    }
+
+    private class SpeechProductionListener implements ISpeechProductionListener{
+        @Override
+        public void onEndOfSpeech() {
+            if (isSpeaking){
+                isSpeaking = false;
+            }
         }
     }
 
@@ -56,11 +73,18 @@ public class SpeechTestActivity extends AppCompatActivity {
             detectionModule = manager.getModuleInstance(ISpeechDetectionModule.class);
 
             SpeechListener listener = new SpeechListener();
+            SpeechProductionListener prodListener = new SpeechProductionListener();
             detectionModule.suscribeAny(listener);
+            productionModule.suscribe(prodListener);
             detectionModule.toggleDetection(true);
+
+            Log.d("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
+            Log.d("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
 
         } catch (ModuleNotFoundException e) {
             e.printStackTrace();
+        } catch (InternalErrorException e) {
+            throw new RuntimeException(e);
         }
     }
 }

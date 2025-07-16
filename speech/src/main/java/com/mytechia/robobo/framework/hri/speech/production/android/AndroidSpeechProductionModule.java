@@ -61,8 +61,8 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
     Collection<ITtsVoice> voices = null;
     private String TAG = "AnsdroidSpeechP";
     private Properties speechProperties = null;
-    private float speechRate;
-    private float speechPitch;
+    public float speechRate;
+    public float speechPitch;
 
     //endregion
 
@@ -185,6 +185,8 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
     public void startup(RoboboManager roboboManager) throws InternalErrorException {
         context = roboboManager.getApplicationContext();
 
+        roboboManager.log(TAG, "Starting up Android Speech Production Module");
+
         AssetManager assetManager = roboboManager.getApplicationContext().getAssets();
         speechProperties = new Properties();
         try {
@@ -237,12 +239,12 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
         if (loc.getLanguage().equals("es")) {
             speechRate = 1.2f;
-            if(speechProperties.contains("speech_rate")){
+            if(speechProperties.containsKey("speech_rate")){
                 speechRate = Float.parseFloat(speechProperties.getProperty("speech_rate"));
             }
 
             speechPitch = 0.4f;
-            if(speechProperties.contains("speech_pitch")){
+            if(speechProperties.containsKey("speech_pitch")){
                 speechPitch = Float.parseFloat(speechProperties.getProperty("speech_pitch"));
             }
 
@@ -250,17 +252,20 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
             tts.setSpeechRate(speechRate);
         }else{
             speechRate = 1.2f;
-            if(speechProperties.contains("speech_rate")){
+            if(speechProperties.containsKey("speech_rate")){
                 speechRate = Float.parseFloat(speechProperties.getProperty("speech_rate"));
             }
 
             speechPitch = 0.48f;
-            if(speechProperties.contains("speech_pitch")){
+            if(speechProperties.containsKey("speech_pitch")){
                 speechPitch = Float.parseFloat(speechProperties.getProperty("speech_pitch"));
             }
 
             tts.setPitch(speechPitch);
             tts.setSpeechRate(speechRate);
+
+            roboboManager.log(TAG, "Pitch: " + speechPitch);
+            roboboManager.log(TAG, "Rate: " + speechRate);
         }
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
@@ -323,6 +328,16 @@ public class AndroidSpeechProductionModule extends ASpeechProductionModule {
 
     public void setSpeechRate(float speechRate){
         tts.setSpeechRate(speechRate);
+    }
+
+    @Override
+    public float getPitch() {
+        return speechPitch;
+    }
+
+    @Override
+    public float getSpeechRate() {
+        return speechRate;
     }
 
     //endregion

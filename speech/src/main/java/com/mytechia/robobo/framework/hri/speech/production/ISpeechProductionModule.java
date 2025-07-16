@@ -83,4 +83,12 @@ public interface ISpeechProductionModule extends IModule {
      * @param listener The listener to be removed
      */
     void unsuscribe(ISpeechProductionListener listener);
+
+    void setPitch(float pitch);
+
+    void setSpeechRate(float speechRate);
+
+    float getPitch();
+
+    float getSpeechRate();
 }

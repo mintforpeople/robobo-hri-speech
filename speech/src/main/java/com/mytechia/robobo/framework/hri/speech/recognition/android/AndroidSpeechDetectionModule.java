@@ -135,7 +135,9 @@ public class AndroidSpeechDetectionModule extends ASpeechDetectionModule {
             public void onError(int error) {
                 Log.e(TAG, "Error: " + error);
                 if (callback != null) {
-                    callback.onError("Error code: " + error);
+                    if (error != SpeechRecognizer.ERROR_NO_MATCH){
+                        callback.onError("Error code: " + error);
+                    }
                 }
                 restartListening();  // Attempt to recover from error
             }
@@ -159,6 +161,8 @@ public class AndroidSpeechDetectionModule extends ASpeechDetectionModule {
             @Override
             public void onEvent(int eventType, Bundle params) {}
         });
+
+        startListening();
     }
 
     public void startListening() {
@@ -198,24 +202,10 @@ public class AndroidSpeechDetectionModule extends ASpeechDetectionModule {
         return "v0.1";
     }
 
-
-    private void processResult(String s){
-        processResult(s, false);
-    }
-
-    private void processResult(String s, boolean finalResult){
+    private void processResult(String s) {
         //Check better iteration options
         if (!doDetection)
             return;
-        try {
-            JSONObject jsonObject = new JSONObject(s);
-            if(jsonObject.has("text")) {
-                String message =  jsonObject.getString("text");
-                if (!message.equals("")) notifyPhrase(message, finalResult);
-            }
-
-        }catch (JSONException e) {
-            m.log(LogLvl.ERROR, TAG,"Couldnt Process Vosk JSON object: " + e.getMessage());
-        }
+        if (!s.equals("")) notifyPhrase(s, true);
     }
 }

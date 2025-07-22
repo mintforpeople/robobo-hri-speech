@@ -83,8 +83,6 @@ public class SpeechTestActivity extends AppCompatActivity {
 
         } catch (ModuleNotFoundException e) {
             e.printStackTrace();
-        } catch (InternalErrorException e) {
-            throw new RuntimeException(e);
         }
     }
 }

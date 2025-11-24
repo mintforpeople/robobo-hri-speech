@@ -31,4 +31,6 @@ public interface ISpeechDetectionModule extends IModule {
     public void unsuscribeAll(ISpeechListener listener);
 
     public void toggleDetection(boolean status);
+
+    public boolean isDetecting();
 }

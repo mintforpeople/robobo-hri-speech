@@ -19,7 +19,7 @@ public class PermissionsRequest extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,
                     new String[]{
                             Manifest.permission.RECORD_AUDIO,
-
+                            Manifest.permission.BLUETOOTH_CONNECT
                     },
                     1);
         }

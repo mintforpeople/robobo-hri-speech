@@ -1,6 +1,15 @@
 package com.mytechia.robobo.framework.hri.speech.recognition.Vosk;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothHeadset;
+import android.bluetooth.BluetoothProfile;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
+import android.media.AudioManager;
 import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
@@ -27,6 +36,7 @@ import org.vosk.android.StorageService;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -35,12 +45,17 @@ import java.util.Properties;
  */
 public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements RecognitionListener {
     private Model model;
-    private SpeechService speechService;
+    public SpeechService speechService;
     private Recognizer recognizer;
     private float samplerate = 16000.f;
     private String TAG = "VoskSpeechDetectionModule";
 
     private Locale loc = null;
+
+    // ✅ NEW fields
+    private AudioManager audioManager;
+    private BluetoothHeadset bluetoothHeadset;
+    private boolean waitingForSco = false;
 
 
     @Override
@@ -92,11 +107,73 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
                     this.model = model;
                     m.log(LogLvl.DEBUG, TAG,":   model " + model);
                     m.log(LogLvl.DEBUG, TAG,"Model loaded");
-                    soundServiceStartup();
+                    //soundServiceStartup();
+                    checkBluetoothBeforeStart();
                 },
                 (exception) -> m.logError(TAG, exception.getMessage(), exception));
         ///
 
+    }
+
+    private final BluetoothProfile.ServiceListener headsetServiceListener =
+            new BluetoothProfile.ServiceListener() {
+
+                @Override
+                public void onServiceConnected(int profile, BluetoothProfile proxy) {
+                    if (profile == BluetoothProfile.HEADSET) {
+                        bluetoothHeadset = (BluetoothHeadset) proxy;
+                        List<BluetoothDevice> devices = bluetoothHeadset.getConnectedDevices();
+
+                        if (!devices.isEmpty()) {
+                            m.log(LogLvl.DEBUG, TAG, "Bluetooth mic detected — enabling SCO");
+                            enableBluetoothSco();
+                        } else {
+                            m.log(LogLvl.DEBUG, TAG, "No Bluetooth mic connected — using internal mic");
+                            soundServiceStartup();
+                        }
+                    }
+                }
+
+                @Override
+                public void onServiceDisconnected(int profile) { }
+            };
+
+    private void enableBluetoothSco() {
+        waitingForSco = true;
+
+        IntentFilter filter = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+        m.getApplicationContext().registerReceiver(scoReceiver, filter);
+
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.startBluetoothSco();
+        audioManager.setBluetoothScoOn(true);
+    }
+
+    private final BroadcastReceiver scoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+
+            if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED && waitingForSco) {
+                waitingForSco = false;
+                context.unregisterReceiver(this);
+
+                m.log(LogLvl.DEBUG, TAG, "SCO connected — starting Vosk");
+                soundServiceStartup();
+            }
+        }
+    };
+
+    private void checkBluetoothBeforeStart() {
+
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null || !adapter.isEnabled()) {
+            m.log(LogLvl.DEBUG, TAG, "No Bluetooth — using internal mic");
+            soundServiceStartup();
+            return;
+        }
+
+        adapter.getProfileProxy(m.getApplicationContext(), headsetServiceListener, BluetoothProfile.HEADSET);
     }
 
     private void soundServiceStartup(){
@@ -105,6 +182,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
             m.log(LogLvl.DEBUG, TAG,"Recognizer loaded");
             speechService = new SpeechService(recognizer, samplerate);
             m.log(LogLvl.DEBUG, TAG,"Sound service loaded");
+            toggleDetection(false);
             speechService.startListening(this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -114,6 +192,16 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     @Override
     public void shutdown() throws InternalErrorException {
         if (speechService != null) {
+            if (audioManager != null) {
+                audioManager.setBluetoothScoOn(false);
+                audioManager.stopBluetoothSco();
+            }
+
+            if (bluetoothHeadset != null) {
+                BluetoothAdapter.getDefaultAdapter()
+                        .closeProfileProxy(BluetoothProfile.HEADSET, bluetoothHeadset);
+            }
+
             speechService.cancel();
             speechService.shutdown();
         }
@@ -154,6 +242,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
             JSONObject jsonObject = new JSONObject(s);
             if(jsonObject.has("text")) {
                 String message =  jsonObject.getString("text");
+                m.log(LogLvl.DEBUG, TAG,"Final: " + finalResult + " // Notifying phrase: " + message);
                 if (!message.equals("")) notifyPhrase(message, finalResult);
             }
 
@@ -170,7 +259,6 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     @Override
     public void onTimeout() {
         //Check for debug
-
         m.log(LogLvl.TRACE, TAG, "Vosk Recognizer timed out. Restarting. Time: " + System.currentTimeMillis());
         speechService.cancel();
         soundServiceStartup();

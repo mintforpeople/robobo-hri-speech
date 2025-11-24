@@ -69,6 +69,11 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
         this.detectAnything = !status;
     }
 
+    @Override
+    public boolean isDetecting() {
+        return doDetection;
+    }
+
     protected void registerCommands(){
         remoteModule.registerCommand("SPEECH-ADD-PHRASE", new ICommandExecutor() {
             @Override

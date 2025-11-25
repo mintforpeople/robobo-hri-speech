@@ -1,6 +1,12 @@
 package com.mytechia.robobo.framework.speech;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -24,6 +30,8 @@ public class SpeechTestActivity extends AppCompatActivity {
     private TextView SpeechTextView;
 
     private Boolean isSpeaking = false;
+
+    private AudioManager audioManager;
 
     private class SpeechListener implements ISpeechListener{
         @Override
@@ -74,13 +82,34 @@ public class SpeechTestActivity extends AppCompatActivity {
 
             SpeechListener listener = new SpeechListener();
             SpeechProductionListener prodListener = new SpeechProductionListener();
-            detectionModule.suscribeAny(listener);
-            productionModule.suscribe(prodListener);
-            detectionModule.toggleDetection(true);
 
-            Log.d("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
-            Log.d("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
+            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
+            if (!audioManager.isBluetoothScoAvailableOffCall()) {
+                Log.e("BT", "SCO not available");
+                return;
+            }
+
+            audioManager.startBluetoothSco();
+            audioManager.setBluetoothScoOn(true);
+
+            // Listen for SCO state
+            IntentFilter filter = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
+            registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
+                    if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
+                        Log.d("BT", "Bluetooth SCO connected");
+                        detectionModule.suscribeAny(listener);
+                        productionModule.suscribe(prodListener);
+                        detectionModule.toggleDetection(true);
+
+                        Log.d("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
+                        Log.d("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
+                    }
+                }
+            }, filter);
         } catch (ModuleNotFoundException e) {
             e.printStackTrace();
         }

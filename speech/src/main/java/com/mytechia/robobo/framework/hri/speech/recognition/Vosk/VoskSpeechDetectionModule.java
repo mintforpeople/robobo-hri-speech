@@ -137,10 +137,12 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     @Override
     public void onPartialResult(String s) {
         //processResult(s);
+        m.log(LogLvl.DEBUG, TAG,"Partial Speech Detected: " + s);
     }
 
     @Override
     public void onResult(String s) {
+        m.log(LogLvl.DEBUG, TAG,"Speech Detected: " + s);
         processResult(s);
     }
 

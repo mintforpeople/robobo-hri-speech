@@ -107,6 +107,7 @@ public class SpeechTestActivity extends AppCompatActivity {
 
                         Log.d("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
                         Log.d("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
+
                     }
                 }
             }, filter);

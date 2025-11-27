@@ -3,6 +3,7 @@ package com.mytechia.robobo.framework.hri.speech.recognition;
 
 import android.text.TextUtils;
 
+import com.mytechia.robobo.framework.LogLvl;
 import com.mytechia.robobo.framework.RoboboManager;
 import com.mytechia.robobo.framework.remote_control.remotemodule.Command;
 import com.mytechia.robobo.framework.remote_control.remotemodule.ICommandExecutor;
@@ -151,6 +152,7 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
                 st.putContents("message", message);
                 st.putContents("recognized", TextUtils.join(",", recognizedPhrases));
                 st.putContents("final", finalResult + "");
+                m.log(LogLvl.DEBUG, "ASPeechDetectionModule", "Notifying: " + st.toString());
                 remoteModule.postStatus(st);
             }
         }

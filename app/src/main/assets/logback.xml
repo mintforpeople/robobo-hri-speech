@@ -1,0 +1,42 @@
+<configuration>
+
+    <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <tagEncoder>
+            <pattern>%logger{12}</pattern>
+        </tagEncoder>
+        <encoder>
+            <pattern>[%level] - %msg</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SYSLOG" class="ch.qos.logback.classic.net.SyslogAppender">
+        <syslogHost>ur.local</syslogHost>
+        <lazy>true</lazy>
+        <facility>USER</facility>
+
+        <suffixPattern>%logger{12} [%level] - %msg</suffixPattern>
+    </appender>
+
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SYSLOG" />
+
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>/storage/emulated/0/Android/data/com.mytechia.robobo/log-${bySecond}.txt</file>
+        <append>true</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%logger{12} - %d{MM/dd/yyyy-HH:mm:ss,SSS} -  [%level] - %msg \n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="TRACE">
+        <appender-ref ref="logcat" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

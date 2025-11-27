@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -82,6 +84,9 @@ public class SpeechTestActivity extends AppCompatActivity {
 
             SpeechListener listener = new SpeechListener();
             SpeechProductionListener prodListener = new SpeechProductionListener();
+            detectionModule.suscribeAny(listener);
+            productionModule.suscribe(prodListener);
+            detectionModule.toggleDetection(true);
 
             audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -90,9 +95,6 @@ public class SpeechTestActivity extends AppCompatActivity {
                 return;
             }
 
-            audioManager.startBluetoothSco();
-            audioManager.setBluetoothScoOn(true);
-
             // Listen for SCO state
             IntentFilter filter = new IntentFilter(AudioManager.ACTION_SCO_AUDIO_STATE_UPDATED);
             registerReceiver(new BroadcastReceiver() {
@@ -100,17 +102,38 @@ public class SpeechTestActivity extends AppCompatActivity {
                 public void onReceive(Context context, Intent intent) {
                     int state = intent.getIntExtra(AudioManager.EXTRA_SCO_AUDIO_STATE, -1);
                     if (state == AudioManager.SCO_AUDIO_STATE_CONNECTED) {
-                        Log.d("BT", "Bluetooth SCO connected");
-                        detectionModule.suscribeAny(listener);
-                        productionModule.suscribe(prodListener);
-                        detectionModule.toggleDetection(true);
-
-                        Log.d("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
-                        Log.d("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
-
+                        manager.log("BT", "Bluetooth SCO connected");
+                        try {
+                            detectionModule.shutdown();
+                            detectionModule.startup(manager);
+                        } catch (InternalErrorException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    else if (state == AudioManager.SCO_AUDIO_STATE_DISCONNECTED) {
+                        manager.log("BT", "Bluetooth SCO disconnected");
+                        try {
+                            detectionModule.shutdown();
+                            detectionModule.startup(manager);
+                        } catch (InternalErrorException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }, filter);
+
+            manager.log("SpeechTestActivity", "Pitch:"+ productionModule.getPitch());
+            manager.log("SpeechTestActivity", "Rate:"+ productionModule.getSpeechRate());
+
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    audioManager.startBluetoothSco();
+                    audioManager.setBluetoothScoOn(true);
+                }
+            }, 20000);
+
         } catch (ModuleNotFoundException e) {
             e.printStackTrace();
         }

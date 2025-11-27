@@ -152,7 +152,6 @@ public abstract class ASpeechDetectionModule implements ISpeechDetectionModule {
                 st.putContents("message", message);
                 st.putContents("recognized", TextUtils.join(",", recognizedPhrases));
                 st.putContents("final", finalResult + "");
-                m.log(LogLvl.DEBUG, "ASPeechDetectionModule", "Notifying: " + st.toString());
                 remoteModule.postStatus(st);
             }
         }

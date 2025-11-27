@@ -49,6 +49,7 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     private Locale loc = null;
 
 
+
     @Override
     public void startup(RoboboManager manager) throws InternalErrorException {
 
@@ -137,12 +138,11 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
     @Override
     public void onPartialResult(String s) {
         //processResult(s);
-        m.log(LogLvl.DEBUG, TAG,"Partial Speech Detected: " + s);
+        //m.log(LogLvl.DEBUG, TAG,"Partial Speech Detected: " + s);
     }
 
     @Override
     public void onResult(String s) {
-        m.log(LogLvl.DEBUG, TAG,"Speech Detected: " + s);
         processResult(s);
     }
 
@@ -155,14 +155,15 @@ public class VoskSpeechDetectionModule extends ASpeechDetectionModule implements
 
     private void processResult(String s, boolean finalResult){
         //Check better iteration options
-        if (!doDetection)
-            return;
         try {
             JSONObject jsonObject = new JSONObject(s);
             if(jsonObject.has("text")) {
                 String message =  jsonObject.getString("text");
-                m.log(LogLvl.DEBUG, TAG,"Final: " + finalResult + " // Notifying phrase: " + message);
-                if (!message.equals("")) notifyPhrase(message, finalResult);
+                if ((!message.equals("") || message.length() > 0)) {
+                    m.log(LogLvl.DEBUG, TAG,"Final: " + finalResult + " // Message: " + message);
+                    m.log(LogLvl.DEBUG, TAG,"Detecting: " + doDetection);
+                    if (doDetection) notifyPhrase(message, finalResult);
+                }
             }
 
         }catch (JSONException e) {
